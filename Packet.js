@@ -13,19 +13,19 @@ class Packet {
    * Create a new packet buffer with given ID, type and payload
    * @param  {Number} id A unique max 32 bit client generated request ID
    * @param  {[type]} type Type of the packet
-   * @param  {String} payload Data to be sent encoded in 'ASCII'
+   * @param  {String} payload Data to be sent encoded in 'UTF-8'
    * @return {Buffer} Created packet
    */
   static write (id, type, payload) {
-    // Length of payload in bytes when encoded in ASCII
-    const length = Buffer.byteLength(payload, 'ascii');
+    // Length of payload in bytes when encoded in UTF-8
+    const length = Buffer.byteLength(payload, 'UTF-8');
     // 14 bytes for the length, ID, type and 2-byte padding
     const buffer = Buffer.allocUnsafe(14 + length);
     // Offsets are hardcoded for speed
     buffer.writeInt32LE(10 + length, 0); // Length
     buffer.writeInt32LE(id, 4); // Request ID
     buffer.writeInt32LE(type, 8); // Type
-    buffer.write(payload, 12, 'ascii'); // Payload
+    buffer.write(payload, 12, 'UTF-8'); // Payload
     buffer.writeInt16LE(0, 12 + length); // Two null bytes of padding
     return buffer;
   }
@@ -44,7 +44,7 @@ class Packet {
         length: length,
         id: packet.readInt32LE(4),
         type: packet.readInt32LE(8),
-        payload: packet.toString('ascii', 12, packet.length - 2)
+        payload: packet.toString('UTF-8', 12, packet.length - 2)
       };
     } else {
       throw new Error(`Invalid packet! [${packet}]`);
